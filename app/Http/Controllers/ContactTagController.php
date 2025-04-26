@@ -2,63 +2,59 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ContactTag;
 use Illuminate\Http\Request;
 
 class ContactTagController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $contactTags = ContactTag::all();
+        return view('contact_tags.index', compact('contactTags'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('contact_tags.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'contact_id' => 'required|integer',
+            'tag_id' => 'required|integer',
+        ]);
+
+        ContactTag::create($request->all());
+
+        return redirect()->route('contact_tags.index')->with('success', 'ContactTag created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit($id)
     {
-        //
+        $contactTag = ContactTag::findOrFail($id);
+        return view('contact_tags.edit', compact('contactTag'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $contactTag = ContactTag::findOrFail($id);
+
+        $request->validate([
+            'contact_id' => 'required|integer',
+            'tag_id' => 'required|integer',
+        ]);
+
+        $contactTag->update($request->all());
+
+        return redirect()->route('contact_tags.index')->with('success', 'ContactTag updated successfully.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy($id)
     {
-        //
-    }
+        $contactTag = ContactTag::findOrFail($id);
+        $contactTag->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('contact_tags.index')->with('success', 'ContactTag deleted successfully.');
     }
 }

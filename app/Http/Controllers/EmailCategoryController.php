@@ -2,63 +2,57 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EmailCategory;
 use Illuminate\Http\Request;
 
 class EmailCategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $emailCategories = EmailCategory::all();
+        return view('email_categories.index', compact('emailCategories'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('email_categories.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        EmailCategory::create($request->all());
+
+        return redirect()->route('email_categories.index')->with('success', 'EmailCategory created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit($id)
     {
-        //
+        $emailCategory = EmailCategory::findOrFail($id);
+        return view('email_categories.edit', compact('emailCategory'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $emailCategory = EmailCategory::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $emailCategory->update($request->all());
+
+        return redirect()->route('email_categories.index')->with('success', 'EmailCategory updated successfully.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy($id)
     {
-        //
-    }
+        $emailCategory = EmailCategory::findOrFail($id);
+        $emailCategory->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('email_categories.index')->with('success', 'EmailCategory deleted successfully.');
     }
 }

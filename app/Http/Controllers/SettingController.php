@@ -2,63 +2,59 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Segment;
 use Illuminate\Http\Request;
 
-class SettingController extends Controller
+class SegmentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $segments = Segment::all();
+        return view('segments.index', compact('segments'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('segments.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        Segment::create($request->all());
+
+        return redirect()->route('segments.index')->with('success', 'Segment created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit($id)
     {
-        //
+        $segment = Segment::findOrFail($id);
+        return view('segments.edit', compact('segment'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $segment = Segment::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $segment->update($request->all());
+
+        return redirect()->route('segments.index')->with('success', 'Segment updated successfully.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy($id)
     {
-        //
-    }
+        $segment = Segment::findOrFail($id);
+        $segment->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('segments.index')->with('success', 'Segment deleted successfully.');
     }
 }

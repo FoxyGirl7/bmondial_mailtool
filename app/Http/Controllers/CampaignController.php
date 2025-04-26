@@ -3,15 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Campaign;
 
 class CampaignController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * 1. Display a listing of the campaigns.
      */
     public function index()
     {
-        //
+        $campaigns = Campaign::all();
+        return view('campaign.index', compact('campaigns'));
     }
 
     /**
@@ -19,7 +21,7 @@ class CampaignController extends Controller
      */
     public function create()
     {
-        //
+        return view('campaigns.create');
     }
 
     /**
@@ -27,7 +29,16 @@ class CampaignController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'subject' => 'required|string|max:255',
+            'content' => 'required|string',
+        ]);
+
+        Campaign::create($request->all());
+
+        return redirect()->route('campaigns.index')->with('success', 'Campaign created successfully.');
+        
     }
 
     /**
@@ -43,7 +54,8 @@ class CampaignController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $campaign = Campaign::findOrFail($id);
+        return view('campaigns.edit', compact('campaign'));
     }
 
     /**
@@ -51,7 +63,16 @@ class CampaignController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'subject' => 'required|string|max:255',
+            'content' => 'required|string',
+        ]);
+
+        $campaign = Campaign::findOrFail($id);
+        $campaign->update($request->all());
+
+        return redirect()->route('campaigns.index')->with('success', 'Campaign updated successfully.');
     }
 
     /**
@@ -59,6 +80,9 @@ class CampaignController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $campaign = Campaign::findOrFail($id);
+        $campaign->delete();
+
+        return redirect()->route('campaigns.index')->with('success', 'Campaign deleted successfully.');
     }
 }
