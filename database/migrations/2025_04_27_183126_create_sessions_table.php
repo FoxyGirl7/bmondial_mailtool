@@ -16,17 +16,14 @@ return new class extends Migration
         $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
         $table->text('payload');
         $table->integer('last_activity');
-        $table->string('ip_address')->nullable();  // This is the new column you're adding
-        $table->string('user_agent')->nullable();
+        $table->string('ip_address')->nullable(); // Adding the 'ip_address' column
+        $table->string('user_agent')->nullable(); // Adding the 'user_agent' column
     });
 }
 
+public function down()
+{
+    Schema::dropIfExists('sessions');
+}
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('sessions');
-    }
 };
