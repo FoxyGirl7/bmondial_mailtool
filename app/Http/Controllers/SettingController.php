@@ -2,59 +2,43 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Segment;
 use Illuminate\Http\Request;
+use App\Models\Setting;
+use Illuminate\Support\Facades\Auth;
 
-class SegmentController extends Controller
+class SettingController extends Controller
 {
     public function index()
     {
-        $segments = Segment::all();
-        return view('segments.index', compact('segments'));
+        $user = Auth::user();
+        $setting = Setting::where('user_id', $user->id)->first();
+
+        return view('settings.index', compact('setting'));
     }
 
-    public function create()
+    public function edit()
     {
-        return view('segments.create');
+        $user = Auth::user();
+        $setting = Setting::where('user_id', $user->id)->first();
+
+        return view('settings.edit', compact('setting'));
     }
 
-    public function store(Request $request)
+    public function update(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'timezone' => 'required|string',
+            'language' => 'required|string',
+            'notifications_enabled' => 'required|boolean',
         ]);
 
-        Segment::create($request->all());
+        $user = Auth::user();
+        $setting = Setting::updateOrCreate(
+            ['user_id' => $user->id],
+            $request->only(['timezone', 'language', 'notifications_enabled'])
+        );
 
-        return redirect()->route('segments.index')->with('success', 'Segment created successfully.');
-    }
-
-    public function edit($id)
-    {
-        $segment = Segment::findOrFail($id);
-        return view('segments.edit', compact('segment'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $segment = Segment::findOrFail($id);
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
-
-        $segment->update($request->all());
-
-        return redirect()->route('segments.index')->with('success', 'Segment updated successfully.');
-    }
-
-    public function destroy($id)
-    {
-        $segment = Segment::findOrFail($id);
-        $segment->delete();
-
-        return redirect()->route('segments.index')->with('success', 'Segment deleted successfully.');
+        return redirect()->route('settings.index')->with('success', 'Settings updated successfully.');
     }
 }
+

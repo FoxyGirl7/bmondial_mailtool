@@ -1,44 +1,31 @@
 <?php
 
-namespace App\Http\Controllers;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Http\Request;
-use App\Models\Setting;
-use Illuminate\Support\Facades\Auth;
-
-class SettingController extends Controller
+return new class extends Migration
 {
-    public function index()
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
-        $user = Auth::user();
-        $setting = Setting::where('user_id', $user->id)->first();
-
-        return view('settings.index', compact('setting'));
+        Schema::create('settings', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users');
+            $table->string('timezone');
+            $table->string('language');
+            $table->boolean('notifications_enabled');
+            $table->timestamps();
+        });
     }
 
-    public function edit()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
-        $user = Auth::user();
-        $setting = Setting::where('user_id', $user->id)->first();
-
-        return view('settings.edit', compact('setting'));
+        Schema::dropIfExists('settings');
     }
-
-    public function update(Request $request)
-    {
-        $request->validate([
-            'timezone' => 'required|string',
-            'language' => 'required|string',
-            'notifications_enabled' => 'required|boolean',
-        ]);
-
-        $user = Auth::user();
-        $setting = Setting::updateOrCreate(
-            ['user_id' => $user->id],
-            $request->only(['timezone', 'language', 'notifications_enabled'])
-        );
-
-        return redirect()->route('settings.index')->with('success', 'Settings updated successfully.');
-    }
-}
-
+};
